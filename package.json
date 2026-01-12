@@ -1,0 +1,17 @@
+{
+  "name": "twimodo",
+  "version": "1.0.0",
+  "description": "一人用ツイッターもどき",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js server",
+    "migrate": "node migrate.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "sqlite3": "^5.1.7",
+    "multer": "^1.4.5-lts.1",
+    "fs-extra": "^11.2.0",
+    "mustache": "^4.2.0"
+  }
+}

@@ -1,0 +1,22 @@
+<div class="timeline">
+    {{#posts}}
+    <article class="post">
+        <div class="post-content">{{content}}</div>
+        {{#images.length}}
+        <div class="post-images">
+            {{#images}}
+            <img src="images/{{.}}" loading="lazy" alt="image">
+            {{/images}}
+        </div>
+        {{/images.length}}
+        <div class="post-meta">
+            <a href="{{postUrl}}">{{formattedDate}}</a>
+        </div>
+    </article>
+    {{/posts}}
+    {{^posts}}
+    <div style="text-align:center; padding: 2rem; color: #536471;">
+        まだ投稿がありません。<a href="post.html" style="color:var(--primary)">最初の投稿をする</a>
+    </div>
+    {{/posts}}
+</div>

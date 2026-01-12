@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}} - Twimodo</title>
+    <style>
+        :root {
+            --primary: #1d9bf0;
+            --bg: #f7f9f9;
+            --text: #0f1419;
+            --border: #eff3f4;
+            --card-bg: #ffffff;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+        header {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        header h1 { margin: 0; font-size: 1.5rem; color: var(--primary); }
+        header a { text-decoration: none; color: inherit; }
+        header nav a { margin-left: 1rem; font-weight: bold; color: var(--text); }
+        header nav a:hover { color: var(--primary); }
+        main {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .post {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .post-content {
+            font-size: 1rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .post-images {
+            margin-top: 0.5rem;
+            display: grid;
+            gap: 0.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        }
+        .post-images img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            object-fit: cover;
+            max-height: 300px;
+        }
+        .post-meta {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: #536471;
+            text-align: right;
+        }
+        .post-meta a { color: inherit; text-decoration: none; }
+        .post-meta a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">Twimodo</a></h1>
+        <nav>
+            <a href="post.html">投稿する</a>
+            <a href="index.html">タイムライン</a>
+        </nav>
+    </header>
+    <main>
+        {{{content}}}
+    </main>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<article class="post single-post">
+    <div class="post-content">{{post.content}}</div>
+    {{#post.images.length}}
+    <div class="post-images">
+        {{#post.images}}
+        <img src="images/{{.}}" alt="image">
+        {{/post.images}}
+    </div>
+    {{/post.images.length}}
+    <div class="post-meta">
+        {{post.formattedDate}}
+    </div>
+</article>
+<div style="margin-top: 1rem; text-align: center;">
+    <a href="index.html" style="color: var(--primary); text-decoration: none;">&larr; タイムラインに戻る</a>
+</div>

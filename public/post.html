@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新規投稿 - Twimodo</title>
+    <style>
+        :root {
+            --primary: #1d9bf0;
+            --bg: #f7f9f9;
+            --text: #0f1419;
+            --border: #eff3f4;
+            --card-bg: #ffffff;
+            --error: #f4212e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            color: var(--text);
+        }
+
+        header {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        header a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        header nav a {
+            margin-left: 1rem;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        header nav a:hover {
+            color: var(--primary);
+        }
+
+        main {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .post-form {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        textarea {
+            width: 100%;
+            border: none;
+            resize: none;
+            font-size: 1.2rem;
+            font-family: inherit;
+            outline: none;
+            margin-bottom: 1rem;
+            min-height: 100px;
+            box-sizing: border-box;
+        }
+
+        .image-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 1rem;
+        }
+
+        .image-area.active {
+            border-color: var(--primary);
+            background-color: rgba(29, 155, 240, 0.1);
+        }
+
+        .image-previews {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+
+        .char-count {
+            font-size: 0.9rem;
+            color: #536471;
+        }
+
+        .char-count.warn {
+            color: #f91880;
+        }
+
+        button[type="submit"] {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #fileInput {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1><a href="index.html">Twimodo</a></h1>
+        <nav>
+            <a href="post.html">投稿する</a>
+            <a href="index.html">タイムライン</a>
+        </nav>
+    </header>
+    <main>
+        <div class="post-form">
+            <form action="/api/posts" method="POST" enctype="multipart/form-data" id="postForm">
+                <textarea name="content" placeholder="いまどうしてる？" maxlength="280" id="content" required></textarea>
+
+                <div class="image-previews" id="previews"></div>
+
+                <div class="image-area" id="dropZone">
+                    <p style="margin:0; color:var(--primary)">📷 画像を追加 (クリック または D&D)</p>
+                    <p style="margin:0; font-size:0.8rem; color:#aaa">最大4枚 / 5MBまで</p>
+                </div>
+                <input type="file" name="images" id="fileInput" multiple accept="image/png, image/jpeg">
+
+                <div class="toolbar">
+                    <span class="char-count" id="charCount">0 / 280</span>
+                    <button type="submit" id="submitBtn">ツイートする</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const previews = document.getElementById('previews');
+        const form = document.getElementById('postForm');
+        const content = document.getElementById('content');
+        const charCount = document.getElementById('charCount');
+
+        let files = [];
+        const MAX_FILES = 4;
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('active');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('active');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('active');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        function handleFiles(newFiles) {
+            if (files.length + newFiles.length > MAX_FILES) {
+                alert('最大4枚までです');
+                return;
+            }
+            Array.from(newFiles).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    files.push(file);
+                    addPreview(file);
+                }
+            });
+            updateFileInput();
+        }
+
+        function addPreview(file) {
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(file);
+            const btn = document.createElement('button');
+            btn.className = 'remove-btn';
+            btn.innerHTML = '&times;';
+            btn.onclick = (e) => {
+                e.preventDefault(); // Prevent form submit
+                removeFile(file, div);
+            };
+            div.appendChild(img);
+            div.appendChild(btn);
+            previews.appendChild(div);
+        }
+
+        function removeFile(file, div) {
+            files = files.filter(f => f !== file);
+            div.remove();
+            updateFileInput();
+        }
+
+        function updateFileInput() {
+            // Cannot manually set files on input[type=file] easily for submission standardly
+            // Standard approach: use DataTransfer to update the input's files property
+            const dt = new DataTransfer();
+            files.forEach(f => dt.items.add(f));
+            fileInput.files = dt.files;
+        }
+
+        content.addEventListener('input', () => {
+            const len = content.value.length;
+            charCount.textContent = `${len} / 280`;
+            if (len > 280) {
+                charCount.classList.add('warn');
+            } else {
+                charCount.classList.remove('warn');
+            }
+        });
+    </script>
+</body>
+
+</html>
